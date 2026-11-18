@@ -142,11 +142,16 @@ def make_summary_table(
     df: pd.DataFrame, true_spread: float, output_path: Path, highlight_probs: list
 ):
     sub = df[df.prob.isin(highlight_probs)].copy()
-    sub["bias_bps"] = sub.bias * 1e4
-    sub["rmse_bps"] = sub.rmse * 1e4
+    sub["Bias (bps)"] = sub.bias * 1e4
+    sub["RMSE (bps)"] = sub.rmse * 1e4
     table = sub.pivot_table(
-        index="estimator", columns="prob", values=["bias_bps", "rmse_bps"]
+        index="estimator", columns="prob", values=["Bias (bps)", "RMSE (bps)"]
     )
+    # Reformat the inner prob column labels: 0.01 / 0.10 / 1.00 instead of 0.010000.
+    table.columns = pd.MultiIndex.from_tuples(
+        [(metric, f"{p:.2f}") for metric, p in table.columns]
+    )
+    table.index.name = "Estimator"
     tex = table.to_latex(
         float_format="%.1f",
         caption=(
@@ -179,7 +184,7 @@ def main():
     highlight_probs = [0.01, 0.10, 1.0]
     dist_prob = 0.05  # the paper's main-finding regime
 
-    output_dir = Path(str(config("OUTPUT_DIR")))
+    output_dir = Path(str(config("OUTPUT_DIR"))) / "simulations"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print(

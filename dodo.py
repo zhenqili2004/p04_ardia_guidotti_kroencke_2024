@@ -51,10 +51,10 @@ def task_monte_carlo():
     return {
         "actions": ["python ./src/simulations/monte_carlo.py"],
         "targets": [
-            OUTPUT_DIR / "mc_bias_rmse.csv",
-            OUTPUT_DIR / "mc_bias_rmse.pdf",
-            OUTPUT_DIR / "mc_distribution.pdf",
-            OUTPUT_DIR / "mc_summary_table.tex",
+            OUTPUT_DIR / "simulations" / "mc_bias_rmse.csv",
+            OUTPUT_DIR / "simulations" / "mc_bias_rmse.pdf",
+            OUTPUT_DIR / "simulations" / "mc_distribution.pdf",
+            OUTPUT_DIR / "simulations" / "mc_summary_table.tex",
         ],
         "file_dep": [
             "./src/simulations/__init__.py",
