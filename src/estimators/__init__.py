@@ -19,8 +19,18 @@ Competitor estimators (Roll 1984; Corwin & Schultz 2012; Abdi & Ranaldo 2017)
 are not in the bidask package and are to be added as sibling modules.
 """
 
+from .abdi_ranaldo import abdi_ranaldo
+from .corwin_schultz import corwin_schultz
 from .edge import edge
 from .edge_expanding import edge_expanding
 from .edge_rolling import edge_rolling
+from .roll import roll
 
-__all__ = ["edge", "edge_rolling", "edge_expanding"]
+__all__ = [
+    "edge",
+    "edge_rolling",
+    "edge_expanding",
+    "roll",
+    "corwin_schultz",
+    "abdi_ranaldo",
+]
