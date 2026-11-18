@@ -44,7 +44,7 @@ from estimators import (
     roll,
 )
 
-FIXTURES = Path(__file__).parent / "estimators" / "_fixtures"
+FIXTURES = Path(__file__).parent.parent / "estimators" / "_fixtures"
 df = pd.read_csv(FIXTURES / "ohlc.csv")
 df_miss = pd.read_csv(FIXTURES / "ohlc-miss.csv")
 
