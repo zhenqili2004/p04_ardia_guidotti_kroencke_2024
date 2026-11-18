@@ -49,7 +49,7 @@ def task_pull():
 def task_monte_carlo():
     """Run Task A2 Monte Carlo and write figures / tables to _output/."""
     return {
-        "actions": ["python ./src/monte_carlo.py"],
+        "actions": ["python ./src/simulations/monte_carlo.py"],
         "targets": [
             OUTPUT_DIR / "mc_bias_rmse.csv",
             OUTPUT_DIR / "mc_bias_rmse.pdf",
@@ -57,8 +57,9 @@ def task_monte_carlo():
             OUTPUT_DIR / "mc_summary_table.tex",
         ],
         "file_dep": [
-            "./src/monte_carlo.py",
-            "./src/simulator.py",
+            "./src/simulations/__init__.py",
+            "./src/simulations/monte_carlo.py",
+            "./src/simulations/simulator.py",
             "./src/settings.py",
             "./src/estimators/__init__.py",
             "./src/estimators/edge.py",

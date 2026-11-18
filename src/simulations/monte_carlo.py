@@ -12,12 +12,20 @@ each trial, and summarise with:
     — the regime where EDGE is designed to dominate)
   - a LaTeX summary table at representative probabilities
 
-Run `python src/monte_carlo.py` for a CI-friendly scale (~1 minute);
-add `--full` for a slow, higher-resolution run (~10+ minutes).
+Run `python src/simulations/monte_carlo.py` for a CI-friendly scale
+(~1 minute); add `--full` for a slow, higher-resolution run (~10+ minutes).
 """
 
-import argparse
+# Shim so direct-script invocation (`python src/simulations/monte_carlo.py`)
+# finds sibling top-level modules (estimators, settings, simulations.*).
+import sys
 from pathlib import Path
+
+_SRC = str(Path(__file__).resolve().parent.parent)
+if _SRC not in sys.path:
+    sys.path.insert(0, _SRC)
+
+import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,7 +33,7 @@ import pandas as pd
 
 from estimators import abdi_ranaldo, corwin_schultz, edge, roll
 from settings import config
-from simulator import simulate_ohlc
+from simulations.simulator import simulate_ohlc
 
 ESTIMATORS = {
     "EDGE": lambda df: edge(df.Open, df.High, df.Low, df.Close),

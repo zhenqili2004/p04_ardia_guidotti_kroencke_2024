@@ -17,7 +17,7 @@ import numpy as np
 import pytest
 
 from estimators import edge
-from simulator import simulate_ohlc
+from simulations.simulator import simulate_ohlc
 
 
 def test_shape_and_columns():
