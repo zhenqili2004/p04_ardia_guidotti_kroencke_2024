@@ -147,9 +147,20 @@ if "STATA_EXE" in cli_vars:
 else:
     defaults["STATA_EXE"] = get_stata_exe()
 
-## Dates
-defaults["START_DATE"] = datetime.strptime("1913-01-01", "%Y-%m-%d")
-defaults["END_DATE"] = datetime.strptime("2024-12-31", "%Y-%m-%d")
+## Dates — replication window
+# These are intentionally module-level constants, NOT routed through `config()` or
+# `defaults`, so they CANNOT be overridden by .env / env vars / CLI args. Two
+# collaborators with different .env files building the same commit must get the
+# same bytes (see PROJECT_SPEC.md §2 Engineering standards).
+#
+# Window covers Ardia, Guidotti, Kroencke (2024, JFE) replication:
+#   - 1993-01-01: TAQ availability starts (needed for ground-truth effective
+#     spreads in the empirical comparison)
+#   - 2021-12-31: paper's sample end; matches Harvard Dataverse publication
+#     supplement cutoff (doi:10.7910/DVN/YAY4H6)
+# The update / extension may widen this window via a separate constant.
+START_DATE = datetime.strptime("1993-01-01", "%Y-%m-%d")
+END_DATE = datetime.strptime("2021-12-31", "%Y-%m-%d")
 
 
 ## File paths

@@ -1,0 +1,39 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests (skip WRDS/credential-dependent)
+        # Tests that need WRDS or other credentials should be marked with
+        # @pytest.mark.wrds and are excluded here. pull_CRSP_stock.py is not
+        # a test file (no test_ prefix) and is therefore not collected.
+        run: pytest -v -m "not wrds" src/
+        env:
+          WRDS_USERNAME: ""

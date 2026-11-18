@@ -266,3 +266,6 @@ bidask_data/
 assets.zip
 _zip_assets.py
 
+# Allow pytest.ini (template-level *.ini would otherwise exclude it)
+!pytest.ini
+
