@@ -32,9 +32,10 @@ only `close` is used.
 """
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 
-def roll(open: np.array, high: np.array, low: np.array, close: np.array) -> float:
+def roll(open: ArrayLike, high: ArrayLike, low: ArrayLike, close: ArrayLike) -> float:
     """
     Roll (1984) effective bid-ask spread estimator from close prices.
 
@@ -53,11 +54,16 @@ def roll(open: np.array, high: np.array, low: np.array, close: np.array) -> floa
         covariance of log-returns is non-negative (Roll's estimator is
         undefined in that case) or if fewer than 3 observations.
     """
-    nobs = len(close)
+    # open, high, low accepted for signature compatibility with edge() /
+    # corwin_schultz() / abdi_ranaldo(); Roll (1984) uses only close.
+    del open, high, low
+
+    close_arr = np.asarray(close, dtype=float)
+    nobs = close_arr.shape[0]
     if nobs < 3:
         return np.nan
 
-    c = np.log(np.asarray(close, dtype=float))
+    c = np.log(close_arr)
     dc = np.diff(c)                      # log returns, length nobs-1
     # Sample autocovariance at lag 1 (ddof=1 to match the usual unbiased
     # estimator; ddof choice only affects small samples).

@@ -1,16 +1,18 @@
 """
 Rolling-window vectorized EDGE estimator.
 
-Ported verbatim from the reference implementation:
+Ported from the reference implementation:
     https://github.com/eguidotti/bidask (MIT License)
     file:  python/bidask/edge_rolling.py
     upstream commit: 1caba55d63eb (2025-10-13)
 
-Accompanying paper:
-    Ardia, D., Guidotti, E., Kroencke, T.A. (2024).
-    Efficient Estimation of Bid-Ask Spreads from Open, High, Low, and Close
-    Prices. Journal of Financial Economics, 161, 103916.
-    https://doi.org/10.1016/j.jfineco.2024.103916
+Numeric logic is bit-identical to upstream. Two typing-only differences:
+  - `np.array` (a function, not a type) replaced with `pd.DataFrame` on the
+    `df` parameter and plain `bool` / `int` elsewhere.
+  - Log-price Series are built via `df[col].apply(np.log)` rather than
+    `np.log(df[col])`, so static type checkers correctly see them as
+    `pd.Series` (and thus expose `.shift`). Runtime behavior is the same
+    because pandas Series dispatch np.log through __array_ufunc__.
 """
 
 import numpy as np
@@ -47,12 +49,14 @@ def edge_rolling(
         A pandas Series of rolling spread estimates. A value of 0.01 corresponds to a spread of 1%.
     """
     # compute log-prices
+    # `.apply(np.log)` preserves the pd.Series type for static type-checkers;
+    # equivalent to `np.log(df["open"])` at runtime.
     df = df.rename(columns=str.lower, inplace=False)
-    o = np.log(df["open"])
-    h = np.log(df["high"])
-    l = np.log(df["low"])
-    c = np.log(df["close"])
-    m = (h + l) / 2.0
+    o: pd.Series = df["open"].apply(np.log)
+    h: pd.Series = df["high"].apply(np.log)
+    l: pd.Series = df["low"].apply(np.log)
+    c: pd.Series = df["close"].apply(np.log)
+    m: pd.Series = (h + l) / 2.0
 
     # shift log-prices by one period
     h1 = h.shift(1)

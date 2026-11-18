@@ -1,10 +1,14 @@
 """
 EDGE: Efficient Discrete Generalized Estimator of bid-ask spreads.
 
-Ported verbatim from the reference implementation:
+Ported from the reference implementation:
     https://github.com/eguidotti/bidask (MIT License)
     file:  python/bidask/edge.py
     upstream commit: 1caba55d63eb (2025-10-13)
+
+Numeric logic is bit-identical to upstream; only the input parameter type
+annotations were corrected from `np.array` (which is a function, not a type,
+and triggers Pyright errors) to `numpy.typing.ArrayLike`.
 
 Accompanying paper:
     Ardia, D., Guidotti, E., Kroencke, T.A. (2024).
@@ -16,13 +20,14 @@ Accompanying paper:
 import warnings
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 
 def edge(
-    open: np.array,
-    high: np.array,
-    low: np.array,
-    close: np.array,
+    open: ArrayLike,
+    high: ArrayLike,
+    low: ArrayLike,
+    close: ArrayLike,
     sign: bool = False,
 ) -> float:
     """
@@ -50,20 +55,21 @@ def edge(
     float
         The spread estimate. A value of 0.01 corresponds to a spread of 1%.
     """
+    # compute log-prices (cast to ndarray so .shape[0] / nanmean work)
+    o = np.log(np.asarray(open))
+    h = np.log(np.asarray(high))
+    l = np.log(np.asarray(low))
+    c = np.log(np.asarray(close))
+
     # check that the open, high, low, and close prices have the same length
-    nobs = len(open)
-    if len(high) != nobs or len(low) != nobs or len(close) != nobs:
+    nobs = o.shape[0]
+    if h.shape[0] != nobs or l.shape[0] != nobs or c.shape[0] != nobs:
         raise ValueError("Open, high, low, and close prices must have the same length")
 
     # return missing if there are less than 3 observations
     if nobs < 3:
         return np.nan
 
-    # compute log-prices
-    o = np.log(np.asarray(open))
-    h = np.log(np.asarray(high))
-    l = np.log(np.asarray(low))
-    c = np.log(np.asarray(close))
     m = (h + l) / 2.0
 
     # shift log-prices by one period

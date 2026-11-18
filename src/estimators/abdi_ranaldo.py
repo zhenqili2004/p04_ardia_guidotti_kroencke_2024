@@ -34,10 +34,11 @@ it is drop-in interchangeable with `edge()` for Monte Carlo comparisons;
 """
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 
 def abdi_ranaldo(
-    open: np.array, high: np.array, low: np.array, close: np.array
+    open: ArrayLike, high: ArrayLike, low: ArrayLike, close: ArrayLike
 ) -> float:
     """
     Abdi-Ranaldo (2017) effective bid-ask spread estimator from CHL prices.
@@ -56,15 +57,22 @@ def abdi_ranaldo(
         inner product is non-positive (clipped). NaN if fewer than 2
         observations.
     """
-    nobs = len(close)
-    if len(high) != nobs or len(low) != nobs:
+    # open accepted for signature compatibility with edge() / roll() /
+    # corwin_schultz(); Abdi-Ranaldo (2017) uses only high, low, close.
+    del open
+
+    close_arr = np.asarray(close, dtype=float)
+    high_arr = np.asarray(high, dtype=float)
+    low_arr = np.asarray(low, dtype=float)
+    nobs = close_arr.shape[0]
+    if high_arr.shape[0] != nobs or low_arr.shape[0] != nobs:
         raise ValueError("high, low, close must have the same length")
     if nobs < 2:
         return np.nan
 
-    c = np.log(np.asarray(close, dtype=float))
-    h = np.log(np.asarray(high, dtype=float))
-    l = np.log(np.asarray(low, dtype=float))
+    c = np.log(close_arr)
+    h = np.log(high_arr)
+    l = np.log(low_arr)
     eta = 0.5 * (h + l)
 
     # (c_t - η_t) * (c_t - η_{t+1}), t = 0, ..., T-2

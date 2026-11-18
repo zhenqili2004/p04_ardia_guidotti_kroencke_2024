@@ -38,15 +38,16 @@ Only `high` and `low` (plus `close` if `overnight_adjust=True`) are used.
 """
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 _K = 3.0 - 2.0 * np.sqrt(2.0)  # = 3 - 2√2
 
 
 def corwin_schultz(
-    open: np.array,
-    high: np.array,
-    low: np.array,
-    close: np.array,
+    open: ArrayLike,
+    high: ArrayLike,
+    low: ArrayLike,
+    close: ArrayLike,
     overnight_adjust: bool = False,
     clip_negative: bool = True,
 ) -> float:
@@ -76,15 +77,19 @@ def corwin_schultz(
         Proportional spread estimate (0.01 = 1%). NaN if fewer than 2
         observations or if no valid two-day windows remain.
     """
-    nobs = len(high)
-    if len(low) != nobs or len(close) != nobs:
-        raise ValueError("high, low, close must have the same length")
-    if nobs < 2:
-        return np.nan
+    # open accepted for signature compatibility with edge() / roll() /
+    # abdi_ranaldo(); Corwin-Schultz (2012) uses only high, low (and close
+    # when overnight_adjust=True).
+    del open
 
     h = np.asarray(high, dtype=float).copy()
     l = np.asarray(low, dtype=float).copy()
     c = np.asarray(close, dtype=float)
+    nobs = h.shape[0]
+    if l.shape[0] != nobs or c.shape[0] != nobs:
+        raise ValueError("high, low, close must have the same length")
+    if nobs < 2:
+        return np.nan
 
     if overnight_adjust:
         # Shift h[t+1] and l[t+1] by the overnight return inferred from c[t].
