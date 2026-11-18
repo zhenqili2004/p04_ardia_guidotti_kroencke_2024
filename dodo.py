@@ -46,6 +46,31 @@ def task_pull():
     }
 
 
+def task_monte_carlo():
+    """Run Task A2 Monte Carlo and write figures / tables to _output/."""
+    return {
+        "actions": ["python ./src/monte_carlo.py"],
+        "targets": [
+            OUTPUT_DIR / "mc_bias_rmse.csv",
+            OUTPUT_DIR / "mc_bias_rmse.pdf",
+            OUTPUT_DIR / "mc_distribution.pdf",
+            OUTPUT_DIR / "mc_summary_table.tex",
+        ],
+        "file_dep": [
+            "./src/monte_carlo.py",
+            "./src/simulator.py",
+            "./src/settings.py",
+            "./src/estimators/__init__.py",
+            "./src/estimators/edge.py",
+            "./src/estimators/roll.py",
+            "./src/estimators/corwin_schultz.py",
+            "./src/estimators/abdi_ranaldo.py",
+        ],
+        "clean": True,
+        "verbosity": 2,
+    }
+
+
 def task_build_chartbook_site():
     """Build the ChartBook site (published to GitHub Pages)."""
     return {
