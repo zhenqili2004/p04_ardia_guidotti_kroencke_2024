@@ -1,0 +1,232 @@
+# Project Specification
+
+Course-level requirements for this final project, transcribed verbatim from the
+instructor. Keep this file in sync with any updates from the course page.
+
+---
+
+## Repository setup
+
+Your project repository. Create a repository for your replication, scaffolded
+from the chartbook cookiecutter template:
+
+```bash
+cruft create https://github.com/backofficedev/cookiecutter_chartbook
+```
+
+Name it **`p04_ardia_guidotti_kroencke_2024`** — the project number, then the
+authors' last names, then the publication year. This repo is where all of your
+work lives, and you'll publish your results as a ChartBook site on GitHub Pages.
+
+If you keep the repo private, add **`jmbejara`** as a collaborator.
+
+---
+
+## Project Previews: What a Finished Project Looks Like
+
+Every final project asks you to do the same thing: take a finance paper,
+rebuild its dataset from the original sources, reproduce the tables and figures
+that carry its main result, and ship the whole thing as something another
+person can clone and run. That description stays abstract until you see what a
+finished one looks like.
+
+So this page does not show you figures clipped out of published papers. It
+shows you three projects that students in this course actually built, one for
+each of three things a good project gets right: the published site, the
+written report, and the extension. Each section says what to look at and why
+it is worth copying, and ends with questions like the ones you will be asked
+at your final project presentation.
+
+---
+
+### 1. The published site
+
+**Jie Lin and Zimeng Yi — Golez and Jackwerth (2024), *Holding Period Effects
+in Dividend Strip Returns*.** Their project recovers dividend strip prices
+from S&P 500 index option quotes and measures how strip returns depend on the
+holding period.
+
+- Paper
+- Project site
+
+Open it and look at the sidebar before you read anything. It has two sections,
+**Pipeline Charts** and **Pipeline Dataframes**, and the second one is the
+pipeline itself. Eighteen registered dataframes, each with its own page, and
+each page records which dataframes it was built from:
+
+```
+optionmetrics_spx_monthly, crsp_sp500_daily   ->  clean_options
+clean_options                                 ->  implied_rates  ->  implied_rates_1y
+clean_options, implied_rates                  ->  strip_prices
+clean_options, implied_rates                  ->  all_strip_prices
+strip_prices, all_strip_prices,
+  clean_crsp_sp500_monthly, fama_french_monthly,
+  crsp_treasury_returns                       ->  monthly_returns
+```
+
+You can read the whole data lineage of the project off the navigation without
+running a single line of code. The eight raw vendor pulls sit at the top with
+no parents; `monthly_returns`, the table the paper's results come out of,
+names all five of the inputs that feed it.
+
+**What to look at:**
+
+- **The naming tells you the stage.** Raw pulls keep the vendor's name
+  (`optionmetrics_spx_raw`, `crsp_sp500_daily`, `fred_treasury_rates`).
+  Cleaned versions are `clean_*`. Derived quantities are named for the thing
+  they are, not the step that made them: `implied_rates`, `strip_prices`,
+  `monthly_returns`. Someone who has never seen the project can find the right
+  table on the first guess.
+- **Provenance is recorded, not implied.** Open `clean_options` and the page
+  says it was derived from `optionmetrics_spx_monthly` and `crsp_sp500_daily`.
+  That is what turns a folder of parquet files into a catalog: not the files,
+  the description of where each one came from.
+- **Raw and cleaned are both registered.** Publishing only the finished tables
+  would have been less work. Registering the raw pulls beside them is what
+  lets a reader check the cleaning instead of trusting it.
+- **The Chart List is indexed by category and tag**, so charts are findable by
+  subject rather than by filename.
+
+This is the standard to aim at for your own ChartBook site, and it is worth
+opening on the day you start rather than the week you finish. Deciding what to
+register, and what to call it, gets much harder to change later.
+
+**Questions you might be asked:**
+
+- The paper insists on option-implied interest rates rather than the zero
+  curve. Why does that matter for strip prices, and what would Figure 1 look
+  like if you had used Treasury rates?
+- Which option quotes do you need to back out a strip price? Which
+  OptionMetrics filters did you apply, and why?
+- Why should the volatility of strip returns depend on the holding period?
+- If I tighten a filter in `clean_options`, which of your eighteen dataframes
+  are rebuilt, and how does `doit` know?
+- A portfolio manager asks whether short-maturity dividend strips are worth
+  trading. What does your data tell them?
+
+---
+
+### 2. The written report
+
+**Anthony Mazy and Stefano Ramponi — Lewellen (2004), *Predicting Returns with
+Financial Ratios*.** Thirteen pages, fifteen numbered exhibits, every
+statistic generated by the code.
+
+- Paper
+- Repository
+
+The report is built from `reports/replication_report.tex`. What makes it
+worth studying is not the prose, it is the machinery behind the numbers, and
+that machinery is all in the repository:
+
+- **`src/paper_values.py`** holds the paper's published numbers, transcribed
+  by hand from the PDF. The module is deliberately data-only and imports
+  nothing from the pipeline, "so it can be read as a standalone reference and
+  diffed against the PDF." It opens with a block headed
+  `TRANSCRIPTION HAZARD -- read before editing`. Transcribing a table wrong
+  is the quietest way for a replication to go wrong, and they treated that
+  risk as a first-class part of the design.
+- **`tests/test_replication_vs_paper.py`** parameterizes one test per
+  `(predictor, window)` cell, so a single number missing produces a single
+  named failure instead of one opaque red mark. Two of the paper's tables rest
+  on a firm screen the paper never specifies, so those cells cannot be pinned
+  exactly; the suite records that reason and the expected outcome rather than
+  widening the tolerance to paper over it. Their comment explaining why is
+  the best single sentence about testing in any project on this page:
+
+  > Loosening tolerances until these passed would make the whole suite
+  > meaningless — a tolerance is only worth anything if it was fixed before
+  > the numbers were seen.
+
+  Write the paper's numbers down first, in their own file, before you have
+  computed yours. Then the suite can tell you something.
+
+- **`src/diagnose_bm.py`** is a standalone diagnostic that traces an outlier
+  B/M or E/P statistic back to the exact month and fiscal-year data that
+  produced it, written, in its own words, so they could stop "guessing at
+  fixes blind." It is the difference between knowing a number is off and
+  knowing why.
+- **`src/public_fallback.py`** lets parts of the project run without WRDS
+  credentials, so a reader who has no subscription can still get somewhere.
+  Almost nobody thinks to do this, and it is the single thing that most
+  widens the audience for a replication.
+
+**The lesson.** Your replication will not match everything, and that is
+normal — it happens to professional replicators on every paper. What earns
+the points is that you noticed, that the report says so, and that the
+repository holds the evidence.
+
+**Questions you might be asked:**
+
+- Explain Stambaugh bias in two sentences. Why is the bias upward?
+- What does conditioning on ρ < 1 buy you? Your own exhibit says
+  dividend-yield persistence has eroded since the paper was written. What
+  does that do to the estimator today?
+- Two of the paper's tables rest on a firm screen the paper never specifies.
+  How did you set the tolerance for those cells, and why not loosen it?
+- Walk me through building book-to-market from Compustat and CRSP. Where
+  could look-ahead bias creep in?
+- A colleague shows you a predictive regression with a t-statistic of 3 on a
+  highly persistent predictor. What do you ask them?
+
+---
+
+### 3. The extension
+
+**Riley Haas and Marija Jovicic — Martin and Shi, *Forecasting Crashes with
+a Smile*.** In their cohort, each group pitched its plan to the class. Theirs
+scored 19.5 out of 20, and four classmates asked to be put in touch about
+the code afterward, which is the outcome an extension is really aiming at.
+
+- Paper
+- Repository
+
+This paper is the basis of HW 3, so the replication half will be familiar to
+you by the time you see this. Study their extension.
+
+**What their plan did:**
+
+- **It found a gap in the paper's reasoning, not in its data.** The paper
+  bounds the crash probability of an individual stock. Riley and Marija
+  pointed out that the average of individual crash probabilities is not the
+  probability of a sector crash, because idiosyncratic volatility diversifies
+  away in a portfolio. That is a conceptual objection, and it is the kind of
+  idea a data hunt does not produce.
+- **It proposed a direct measurement, not a workaround.** Rather than
+  aggregating single-name bounds, measure sector crash probability straight
+  from the option surfaces of sector ETFs.
+- **It named the product concretely.** An installable `crashbounds` package,
+  plus a three-level case study on the failure of Silicon Valley Bank. Not
+  "a cleaned dataset" in the abstract — a thing with a name that somebody
+  could `pip install`.
+- **It told the class who would use it, and the class believed it.** The four
+  follow-up requests were the proof.
+
+**The structure to steal, for your consultation and for your final project
+presentation.** State the paper's claim in one sentence. Name the specific
+thing the paper does not do. Say what you will build. Say who would clone it
+and why. Then defend all four when asked.
+
+**Questions you might be asked:**
+
+- In words, what does the paper's bound bound, and what information from the
+  option market does it use?
+- Why is the average of single-stock crash probabilities not the probability
+  of a sector crash?
+- What did your bounds say about Silicon Valley Bank before March 2023? How
+  would you tell a real signal from a false alarm?
+- Who would `pip install crashbounds`, and what would they need from you
+  before relying on it every day?
+- How would you validate a crash-probability signal out of sample?
+
+---
+
+## One thing to keep in mind
+
+All three of these were built by groups of two. Yours has four, so aim past
+them: a more complete replication, tests that cover more of it, and an
+extension with more in it. The rubric asks the same things of you that it
+asked of them, and you have twice the hands.
+
+For the full set of finished projects from the last four cohorts, with
+repositories and sites, see **Past Final Projects**.
