@@ -154,13 +154,22 @@ else:
 # same bytes (see PROJECT_SPEC.md §2 Engineering standards).
 #
 # Window covers Ardia, Guidotti, Kroencke (2024, JFE) replication:
-#   - 1993-01-01: TAQ availability starts (needed for ground-truth effective
-#     spreads in the empirical comparison)
-#   - 2021-12-31: paper's sample end; matches Harvard Dataverse publication
-#     supplement cutoff (doi:10.7910/DVN/YAY4H6)
-# The update / extension may widen this window via a separate constant.
-START_DATE = datetime.strptime("1993-01-01", "%Y-%m-%d")
+#   - 1926-01-01: CRSP daily stock file inception. The EDGE estimator's whole
+#     point is working on historical low-frequency data where TAQ does not
+#     exist, so the pipeline's default window spans the full CRSP history.
+#   - 2021-12-31: paper's sample end; matches the Harvard Dataverse publication
+#     supplement cutoff (doi:10.7910/DVN/YAY4H6).
+#
+# TAQ-dependent benchmarks (HJ / QM / QW ground-truth effective spreads) only
+# exist from 1993 onward. Task-level code that needs TAQ must clip its own
+# sample to `max(START_DATE, TAQ_START_DATE)` — do NOT shrink the global
+# window to the TAQ subset.
+#
+# Update / extension windows are tracked separately and should not change
+# these constants.
+START_DATE = datetime.strptime("1926-01-01", "%Y-%m-%d")
 END_DATE = datetime.strptime("2021-12-31", "%Y-%m-%d")
+TAQ_START_DATE = datetime.strptime("1993-01-01", "%Y-%m-%d")
 
 
 ## File paths
