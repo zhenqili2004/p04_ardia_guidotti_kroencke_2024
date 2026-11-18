@@ -190,9 +190,11 @@ def edge_rolling(
     )
 
     # compute signed root
-    s = np.sqrt(np.abs(s2))
+    # Use pandas-native ops so static type-checkers see `s` as pd.Series
+    # throughout (np.sqrt/np.abs return NDArray in stubs; runtime is Series).
+    s = s2.abs().pow(0.5)
     if sign:
-        s *= np.sign(s2)
+        s = s.where(s2 >= 0, -s)
 
     # return the spread
     return s
