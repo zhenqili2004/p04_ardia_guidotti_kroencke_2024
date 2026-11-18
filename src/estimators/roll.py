@@ -32,10 +32,13 @@ only `close` is used.
 """
 
 import numpy as np
+import pandas as pd
 from numpy.typing import ArrayLike
 
+_Vec = ArrayLike | pd.Series
 
-def roll(open: ArrayLike, high: ArrayLike, low: ArrayLike, close: ArrayLike) -> float:
+
+def roll(open: _Vec, high: _Vec, low: _Vec, close: _Vec) -> float:
     """
     Roll (1984) effective bid-ask spread estimator from close prices.
 

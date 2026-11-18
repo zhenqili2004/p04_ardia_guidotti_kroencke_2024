@@ -266,6 +266,9 @@ bidask_data/
 assets.zip
 _zip_assets.py
 
+# IDE workspace settings (local)
+.vscode/
+
 # Allow pytest.ini (template-level *.ini would otherwise exclude it)
 !pytest.ini
 

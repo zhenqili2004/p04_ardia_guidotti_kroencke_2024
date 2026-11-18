@@ -20,14 +20,17 @@ Accompanying paper:
 import warnings
 
 import numpy as np
+import pandas as pd
 from numpy.typing import ArrayLike
+
+_Vec = ArrayLike | pd.Series
 
 
 def edge(
-    open: ArrayLike,
-    high: ArrayLike,
-    low: ArrayLike,
-    close: ArrayLike,
+    open: _Vec,
+    high: _Vec,
+    low: _Vec,
+    close: _Vec,
     sign: bool = False,
 ) -> float:
     """

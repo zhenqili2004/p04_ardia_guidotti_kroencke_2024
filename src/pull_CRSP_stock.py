@@ -32,7 +32,7 @@ from pandas.tseries.offsets import MonthEnd
 
 from settings import END_DATE, START_DATE, config
 
-DATA_DIR = Path(config("DATA_DIR"))
+DATA_DIR = Path(str(config("DATA_DIR")))
 WRDS_USERNAME = config("WRDS_USERNAME")
 
 

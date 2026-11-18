@@ -34,12 +34,13 @@ it is drop-in interchangeable with `edge()` for Monte Carlo comparisons;
 """
 
 import numpy as np
+import pandas as pd
 from numpy.typing import ArrayLike
 
+_Vec = ArrayLike | pd.Series
 
-def abdi_ranaldo(
-    open: ArrayLike, high: ArrayLike, low: ArrayLike, close: ArrayLike
-) -> float:
+
+def abdi_ranaldo(open: _Vec, high: _Vec, low: _Vec, close: _Vec) -> float:
     """
     Abdi-Ranaldo (2017) effective bid-ask spread estimator from CHL prices.
 

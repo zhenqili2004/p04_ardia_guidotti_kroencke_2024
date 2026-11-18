@@ -191,7 +191,7 @@ def if_relative_make_abs(path):
     if path.is_absolute():
         abs_path = path.resolve()
     else:
-        abs_path = (defaults["BASE_DIR"] / path).resolve()
+        abs_path = (Path(str(defaults["BASE_DIR"])) / path).resolve()
     return abs_path
 
 
@@ -238,7 +238,7 @@ def config(
         if cast is not None:
             env_value = cast(env_value)
         if "DIR" in var_name and convert_dir_vars_to_abs_path:
-            env_value = if_relative_make_abs(Path(env_value))
+            env_value = if_relative_make_abs(Path(str(env_value)))
         return env_value
 
     # 3. Settings.py defaults dictionary
@@ -264,8 +264,8 @@ def config(
 
 
 def create_directories():
-    config("DATA_DIR").mkdir(parents=True, exist_ok=True)
-    config("OUTPUT_DIR").mkdir(parents=True, exist_ok=True)
+    Path(str(config("DATA_DIR"))).mkdir(parents=True, exist_ok=True)
+    Path(str(config("OUTPUT_DIR"))).mkdir(parents=True, exist_ok=True)
 
 
 if __name__ == "__main__":

@@ -46,7 +46,7 @@ def test_prob_zero_gives_flat_output():
     # prev_close is seeded with p[0] (the first simulated tick), so the whole
     # table is one repeated value.
     df = simulate_ohlc(n=50, trades=10, prob=0.0, rng=np.random.default_rng(7))
-    first = df.iloc[0, 0]
+    first = float(df.iloc[0, 0])
     assert np.allclose(df.values, first)
 
 

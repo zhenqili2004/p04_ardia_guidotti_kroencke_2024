@@ -38,16 +38,18 @@ Only `high` and `low` (plus `close` if `overnight_adjust=True`) are used.
 """
 
 import numpy as np
+import pandas as pd
 from numpy.typing import ArrayLike
 
 _K = 3.0 - 2.0 * np.sqrt(2.0)  # = 3 - 2√2
+_Vec = ArrayLike | pd.Series
 
 
 def corwin_schultz(
-    open: ArrayLike,
-    high: ArrayLike,
-    low: ArrayLike,
-    close: ArrayLike,
+    open: _Vec,
+    high: _Vec,
+    low: _Vec,
+    close: _Vec,
     overnight_adjust: bool = False,
     clip_negative: bool = True,
 ) -> float:

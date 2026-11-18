@@ -171,7 +171,7 @@ def main():
     highlight_probs = [0.01, 0.10, 1.0]
     dist_prob = 0.05  # the paper's main-finding regime
 
-    output_dir = Path(config("OUTPUT_DIR"))
+    output_dir = Path(str(config("OUTPUT_DIR")))
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print(
