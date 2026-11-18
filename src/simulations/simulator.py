@@ -1,11 +1,6 @@
 """
 OHLC price-path simulator with embedded bid-ask spread.
 
-Ported from the reference R implementation:
-    https://github.com/eguidotti/bidask (MIT License)
-    file:  r/R/sim.R
-    upstream commit: 1caba55d63eb (2025-10-13)
-
 Numeric model matches the R version. The two implementations will not produce
 bit-identical output for a given seed because R and NumPy use different RNG
 algorithms (R: Mersenne-Twister with its own seeding; NumPy: PCG64 via
@@ -124,12 +119,12 @@ def simulate_ohlc(
         if row_mask.any():
             obs = p_mat[i, row_mask]
             uobs = np.abs(obs)
-            ohlc[i, 0] = obs[0]                     # Open
-            ohlc[i, 1] = obs[np.argmax(uobs)]       # High (by |price|)
-            ohlc[i, 2] = obs[np.argmin(uobs)]       # Low  (by |price|)
-            ohlc[i, 3] = obs[-1]                    # Close
+            ohlc[i, 0] = obs[0]  # Open
+            ohlc[i, 1] = obs[np.argmax(uobs)]  # High (by |price|)
+            ohlc[i, 2] = obs[np.argmin(uobs)]  # Low  (by |price|)
+            ohlc[i, 3] = obs[-1]  # Close
             prev_close = obs[-1]
         else:
-            ohlc[i, :] = prev_close                 # flat day
+            ohlc[i, :] = prev_close  # flat day
 
     return pd.DataFrame(ohlc, columns=["Open", "High", "Low", "Close"])

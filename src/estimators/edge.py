@@ -1,20 +1,9 @@
 """
 EDGE: Efficient Discrete Generalized Estimator of bid-ask spreads.
 
-Ported from the reference implementation:
-    https://github.com/eguidotti/bidask (MIT License)
-    file:  python/bidask/edge.py
-    upstream commit: 1caba55d63eb (2025-10-13)
-
 Numeric logic is bit-identical to upstream; only the input parameter type
 annotations were corrected from `np.array` (which is a function, not a type,
 and triggers Pyright errors) to `numpy.typing.ArrayLike`.
-
-Accompanying paper:
-    Ardia, D., Guidotti, E., Kroencke, T.A. (2024).
-    Efficient Estimation of Bid-Ask Spreads from Open, High, Low, and Close
-    Prices. Journal of Financial Economics, 161, 103916.
-    https://doi.org/10.1016/j.jfineco.2024.103916
 """
 
 import warnings
@@ -92,7 +81,9 @@ def edge(
     r5 = o - c1
 
     # compute indicator variables
-    tau = np.where(np.isnan(h) | np.isnan(l) | np.isnan(c1), np.nan, (h != l) | (l != c1))
+    tau = np.where(
+        np.isnan(h) | np.isnan(l) | np.isnan(c1), np.nan, (h != l) | (l != c1)
+    )
     po1 = tau * np.where(np.isnan(o) | np.isnan(h), np.nan, o != h)
     po2 = tau * np.where(np.isnan(o) | np.isnan(l), np.nan, o != l)
     pc1 = tau * np.where(np.isnan(c1) | np.isnan(h1), np.nan, c1 != h1)

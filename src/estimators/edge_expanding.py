@@ -1,16 +1,5 @@
 """
 Expanding-window EDGE estimator.
-
-Ported verbatim from the reference implementation:
-    https://github.com/eguidotti/bidask (MIT License)
-    file:  python/bidask/edge_expanding.py
-    upstream commit: 1caba55d63eb (2025-10-13)
-
-Accompanying paper:
-    Ardia, D., Guidotti, E., Kroencke, T.A. (2024).
-    Efficient Estimation of Bid-Ask Spreads from Open, High, Low, and Close
-    Prices. Journal of Financial Economics, 161, 103916.
-    https://doi.org/10.1016/j.jfineco.2024.103916
 """
 
 import pandas as pd

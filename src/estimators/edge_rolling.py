@@ -1,11 +1,6 @@
 """
 Rolling-window vectorized EDGE estimator.
 
-Ported from the reference implementation:
-    https://github.com/eguidotti/bidask (MIT License)
-    file:  python/bidask/edge_rolling.py
-    upstream commit: 1caba55d63eb (2025-10-13)
-
 Numeric logic is bit-identical to upstream. Two typing-only differences:
   - `np.array` (a function, not a type) replaced with `pd.DataFrame` on the
     `df` parameter and plain `bool` / `int` elsewhere.
@@ -72,7 +67,9 @@ def edge_rolling(
     r5 = o - c1
 
     # compute indicator variables
-    tau = np.where(np.isnan(h) | np.isnan(l) | np.isnan(c1), np.nan, (h != l) | (l != c1))
+    tau = np.where(
+        np.isnan(h) | np.isnan(l) | np.isnan(c1), np.nan, (h != l) | (l != c1)
+    )
     po1 = tau * np.where(np.isnan(o) | np.isnan(h), np.nan, o != h)
     po2 = tau * np.where(np.isnan(o) | np.isnan(l), np.nan, o != l)
     pc1 = tau * np.where(np.isnan(c1) | np.isnan(h1), np.nan, c1 != h1)

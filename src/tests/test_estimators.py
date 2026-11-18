@@ -6,10 +6,7 @@ Corwin-Schultz (2012), Abdi-Ranaldo (2017).
 The file is organised in three sections:
 
 1. EDGE reference tests
-   Ported from the upstream bidask test suite
-   (https://github.com/eguidotti/bidask, python/tests/test_edge.py,
-   upstream commit 1caba55d63eb, 2025-10-13). Adapted to read the two
-   reference OHLC CSVs from `estimators/_fixtures/` instead of fetching
+   Adapted to read the two reference OHLC CSVs from `estimators/_fixtures/` instead of fetching
    them over the network, so CI is self-contained.
 
 2. EDGE oracle differential tests
