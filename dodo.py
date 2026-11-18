@@ -11,9 +11,7 @@ from settings import config  # noqa: E402
 
 DOIT_CONFIG = {"backend": "sqlite3", "dep_file": "./.doit-db.sqlite"}
 
-BASE_DIR = config("BASE_DIR")
 DATA_DIR = config("DATA_DIR")
-MANUAL_DATA_DIR = config("MANUAL_DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
 OS_TYPE = config("OS_TYPE")
 
