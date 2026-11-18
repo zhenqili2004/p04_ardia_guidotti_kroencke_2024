@@ -46,8 +46,8 @@ def test_prob_zero_gives_flat_output():
     # prev_close is seeded with p[0] (the first simulated tick), so the whole
     # table is one repeated value.
     df = simulate_ohlc(n=50, trades=10, prob=0.0, rng=np.random.default_rng(7))
-    first = float(df.iloc[0, 0])
-    assert np.allclose(df.values, first)
+    arr = df.to_numpy()
+    assert np.allclose(arr, arr[0, 0])
 
 
 @pytest.mark.parametrize("true_spread", [0.005, 0.01, 0.02])
