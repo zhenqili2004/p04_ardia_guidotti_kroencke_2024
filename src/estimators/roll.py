@@ -31,11 +31,12 @@ it is drop-in interchangeable with `edge()` for Monte Carlo comparisons;
 only `close` is used.
 """
 
-import numpy as np
-import pandas as pd
-from numpy.typing import ArrayLike
+from typing import Any
 
-_Vec = ArrayLike | pd.Series
+import numpy as np
+
+# See src/estimators/edge.py for why `_Vec` is Any rather than a precise union.
+_Vec = Any
 
 
 def roll(open: _Vec, high: _Vec, low: _Vec, close: _Vec) -> float:

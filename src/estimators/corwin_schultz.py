@@ -37,12 +37,13 @@ it is drop-in interchangeable with `edge()` for Monte Carlo comparisons.
 Only `high` and `low` (plus `close` if `overnight_adjust=True`) are used.
 """
 
+from typing import Any
+
 import numpy as np
-import pandas as pd
-from numpy.typing import ArrayLike
 
 _K = 3.0 - 2.0 * np.sqrt(2.0)  # = 3 - 2√2
-_Vec = ArrayLike | pd.Series
+# See src/estimators/edge.py for why `_Vec` is Any rather than a precise union.
+_Vec = Any
 
 
 def corwin_schultz(

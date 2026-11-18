@@ -18,12 +18,17 @@ Accompanying paper:
 """
 
 import warnings
+from typing import Any
 
 import numpy as np
-import pandas as pd
-from numpy.typing import ArrayLike
 
-_Vec = ArrayLike | pd.Series
+# `_Vec` is intentionally `Any`: the function accepts anything array-like at
+# runtime (numpy ndarray, pandas Series, list, tuple, ExtensionArray, ...)
+# and immediately coerces via `np.asarray`. Expressing this precisely with
+# numpy's ArrayLike / pandas-stubs' Series unions ends up chasing pandas
+# internal types (ExtensionArray, Categorical) that stubs do not mark as
+# ArrayLike-compatible, so Any is the pragmatic signature.
+_Vec = Any
 
 
 def edge(
