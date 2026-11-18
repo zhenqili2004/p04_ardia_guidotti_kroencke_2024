@@ -1,5 +1,9 @@
+# Efficient Estimation of Bid-Ask Spreads from Open, High, Low, and Close Prices
 
-4. Efficient Estimation of Bid-Ask Spreads from Open, High, Low, and Close Prices
+> **Reference implementation (oracle for our tests):** https://github.com/eguidotti/bidask
+
+---
+
    You can measure the effective spread directly if you have the trades and quotes. Most of the time you do not—you have daily open, high, low, and close, and that is all. The estimators that recover spreads from those four numbers (Roll, Corwin-Schultz, Abdi-Ranaldo) are biased downward when trading is infrequent, which is exactly the case where you most want them. This paper derives estimators that account for discretely observed prices and combines them optimally “to minimize estimation variance,” producing the EDGE estimator now shipping in the bidask package.
 
 What makes this a good course project is the validation structure. The estimator has a published reference implementation, and the quantity it estimates has an observable ground truth in TAQ. You are not comparing your output to a printed table, you are comparing it to the thing itself.
