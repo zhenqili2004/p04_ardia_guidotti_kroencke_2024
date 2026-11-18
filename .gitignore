@@ -1,0 +1,27 @@
+# Local Claude Code state
+.claude/
+
+# Reference materials and large/public datasets (not tracked in repo)
+article/
+bidask_data/
+
+# Build artifacts
+assets.zip
+_zip_assets.py
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+venv/
+env/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
