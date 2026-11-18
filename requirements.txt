@@ -44,6 +44,10 @@ notebook
 chartbook>=0.4.0
 
 
+# Reference implementation used as oracle in tests
+# (compare our src/estimators/ against the upstream bidask package)
+bidask>=2.1.0
+
 # WRDS data access
 wrds>=3.2.0
 jaydebeapi
