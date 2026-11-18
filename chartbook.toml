@@ -1,0 +1,27 @@
+[project]
+name = "p04_ardia_guidotti_kroencke_2024"
+description = "Replication of Ardia, Guidotti, Kroencke (2024, JFE): Efficient Estimation of Bid-Ask Spreads from Open, High, Low, and Close Prices. UChicago FinM Data Pipeline final project."
+maintainer = "Zhenqi Li"
+contributors = ["Zhenqi Li"]
+os_compatibility = ["Windows", "Linux", "macOS"]
+requires_chartbook = ">=0.4.0"
+
+[scripts]
+build = "doit"
+
+[notebooks]
+
+
+[notebooks.01_example_notebook_interactive]
+name = "Example Notebook Interactive"
+description = "Example notebook for demonstrating how to construct a Chartbook notebook."
+path = "_output/01_example_notebook_interactive.ipynb"
+
+
+
+
+[dataframes]
+
+
+[charts]
+
