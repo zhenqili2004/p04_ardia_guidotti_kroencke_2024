@@ -171,6 +171,12 @@ START_DATE = datetime.strptime("1926-01-01", "%Y-%m-%d")
 END_DATE = datetime.strptime("2021-12-31", "%Y-%m-%d")
 TAQ_START_DATE = datetime.strptime("1993-01-01", "%Y-%m-%d")
 
+# Part B core validation panel; April is a retained lag buffer, not analysis.
+# Keep the full-history constants above for the separate historical exercise.
+CRSP_CORE_START = datetime(1993, 5, 1)
+CRSP_CORE_END = datetime(2021, 12, 31)
+CRSP_EXTRACT_START = datetime(1993, 4, 1)
+
 
 ## File paths
 def if_relative_make_abs(path):

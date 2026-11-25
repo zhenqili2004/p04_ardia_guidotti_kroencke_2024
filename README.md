@@ -73,6 +73,15 @@ output to a printed table — you are comparing it to the thing itself.
 
 ## Quick Start
 
+For **Part B's CRSP panel**, start with [CRSP_DATA.md](CRSP_DATA.md): sample,
+cleaning, historical identifiers, monthly estimation decisions, column meanings,
+coverage, reproduction commands and Git/data handling. Production code is Python;
+[CRSP_MONTHLY.md](CRSP_MONTHLY.md) records implementation and optional R validation.
+Run `python -m doit crsp_coverage` for daily inputs and
+`python -m doit crsp_monthly_report` for monthly estimates. These are CRSP-only
+outputs; paper-specific preprocessing assumptions are identified in the guide.
+The existing `pull:crsp_stock` task is separate monthly-data code.
+
 The quickest way to run code in this repo is to use the following steps.
 
 You must have TexLive (or another LaTeX distribution) installed on your computer and available in your path.
@@ -172,8 +181,9 @@ via `.env`:
 
 `settings.py` is the single source of truth for these paths and for analysis
 constants like `START_DATE` / `END_DATE` / `TAQ_START_DATE`. Dates are *not*
-read from `.env` — two collaborators building the same commit must get the
-same bytes.
+read from `.env`. The same commit fixes the analysis window and method, but
+fresh vendor downloads can differ after historical revisions. Preserve the raw
+cache and its extraction manifest when comparing results across collaborators.
 
 Of course, the _data directory and _output directory can be kept elsewhere on the
 machine. To make this easy, I always include the ability to customize these
