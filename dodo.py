@@ -63,6 +63,7 @@ def task_monte_carlo():
             "./src/settings.py",
             "./src/estimators/__init__.py",
             "./src/estimators/edge.py",
+            "./src/estimators/edge_moments.py",
             "./src/estimators/roll.py",
             "./src/estimators/corwin_schultz.py",
             "./src/estimators/abdi_ranaldo.py",
