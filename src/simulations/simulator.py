@@ -29,6 +29,9 @@ ticks are dropped. The period's OHLC is then:
 If a period has zero observed ticks, all four OHLC values inherit the previous
 period's Close (constant-row flat day).
 
+The bar-building step is `extract_ohlc`, which `simulations.violations`
+reuses for the extension's assumption-violation simulator.
+
 Setting `sign=True` returns signed prices (positive for ask/buy, negative for
 bid/sell) so the sampling side of each extremum can be recovered downstream.
 """
@@ -106,25 +109,54 @@ def simulate_ohlc(
     # Observation mask.
     keep = rng.random(m) < prob
 
-    # Reshape to (n, trades) and extract OHLC per row, falling back to the
-    # previous Close when a row has no observed tick.
+    ohlc = extract_ohlc(p, keep, n, trades)
+    return pd.DataFrame(ohlc, columns=["Open", "High", "Low", "Close"])
+
+
+def extract_ohlc(p: np.ndarray, keep: np.ndarray, n: int, trades: int) -> np.ndarray:
+    """
+    Turn a tick-level price path into `n` OHLC bars of `trades` ticks each.
+
+    Shared by `simulate_ohlc` and `simulations.violations`, so both build bars
+    the same way. Vectorized over bars; it picks the same elements as a
+    per-bar loop would (ties go to the earliest tick), so results are exact.
+
+    Parameters
+    ----------
+    p : np.ndarray
+        Trade prices, length n * trades, in time order. May be signed
+        (see `simulate_ohlc(sign=True)`); High and Low are chosen by |price|.
+    keep : np.ndarray of bool
+        Same length as `p`: True where a time slot has a trade (the paper's
+        "observed" price; False means no trade in that slot).
+    n, trades : int
+        Number of bars and time slots per bar.
+
+    Returns
+    -------
+    np.ndarray
+        Shape (n, 4): Open (first trade), High (largest |price|),
+        Low (smallest |price|), Close (last trade). A bar without trades
+        repeats the previous bar's Close in all four columns;
+        if no earlier bar has one either, it repeats `p[0]`.
+    """
     p_mat = p.reshape(n, trades)
     keep_mat = keep.reshape(n, trades)
+    rows = np.arange(n)
 
-    ohlc = np.empty((n, 4), dtype=float)
-    prev_close = p[0]  # seed for the first period if it happens to be empty
+    first = np.argmax(keep_mat, axis=1)
+    last = trades - 1 - np.argmax(keep_mat[:, ::-1], axis=1)
+    abs_p = np.abs(p_mat)
+    high = np.argmax(np.where(keep_mat, abs_p, -np.inf), axis=1)
+    low = np.argmin(np.where(keep_mat, abs_p, np.inf), axis=1)
+    ohlc = np.column_stack(
+        [p_mat[rows, first], p_mat[rows, high], p_mat[rows, low], p_mat[rows, last]]
+    )
 
-    for i in range(n):
-        row_mask = keep_mat[i]
-        if row_mask.any():
-            obs = p_mat[i, row_mask]
-            uobs = np.abs(obs)
-            ohlc[i, 0] = obs[0]  # Open
-            ohlc[i, 1] = obs[np.argmax(uobs)]  # High (by |price|)
-            ohlc[i, 2] = obs[np.argmin(uobs)]  # Low  (by |price|)
-            ohlc[i, 3] = obs[-1]  # Close
-            prev_close = obs[-1]
-        else:
-            ohlc[i, :] = prev_close  # flat day
-
-    return pd.DataFrame(ohlc, columns=["Open", "High", "Low", "Close"])
+    # Bars without trades repeat the previous non-empty bar's Close.
+    has_obs = keep_mat.any(axis=1)
+    if not has_obs.all():
+        last_nonempty = np.maximum.accumulate(np.where(has_obs, rows, -1))
+        fill = np.where(last_nonempty >= 0, ohlc[last_nonempty.clip(min=0), 3], p[0])
+        ohlc[~has_obs] = fill[~has_obs, None]
+    return ohlc
