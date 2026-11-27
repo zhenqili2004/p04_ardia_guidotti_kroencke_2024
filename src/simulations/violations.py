@@ -232,29 +232,40 @@ def _ground_truth(
     else:
         rho_b_realized = rho_b_expected = boundary_gap_mean = np.nan
 
+    # Per-trade sign, price and efficient price, in trade order. Gathered
+    # once; when every slot trades they are the slot arrays themselves.
+    def per_trade(x: np.ndarray) -> np.ndarray:
+        return x if traded.size == x.size else x[traded]
+
+    d_t, p_t, m_t = per_trade(sign), per_trade(price), per_trade(efficient)
+
     # Per-trade effective spread, the paper's Eq. (1).
-    es = np.full(price.size, np.nan)
-    es[traded] = 2.0 * sign[traded] * (price[traded] - efficient[traded])
-    es[traded] /= efficient[traded]
+    es = 2.0 * d_t * (p_t - m_t)
+    es /= m_t
     if traded.size:
-        effective_spread = float(np.sqrt(np.mean(es[traded] ** 2)))
-        s2_open, s2_close = np.mean(es[opens] ** 2), np.mean(es[closes] ** 2)
+        effective_spread = float(np.sqrt(np.mean(es**2)))
+        # Positions of the open / close trades among all trades.
+        pos_close = np.searchsorted(traded, closes)
+        s2_open, s2_close = np.mean(es[pos] ** 2), np.mean(es[pos_close] ** 2)
         effective_spread_open_close = float(np.sqrt((s2_open + s2_close) / 2.0))
     else:
         effective_spread = effective_spread_open_close = np.nan
 
-    k = traded[traded + trades < price.size]
-    if k.size:
-        future_impact = impact_log[k + trades] - impact_log[k]
-        rel_dev = (price[k] - efficient[k]) / efficient[k]
-        realized_spread = float(np.mean(2.0 * sign[k] * (rel_dev - future_impact)))
+    # Trades with a full horizon left: the first n_k (trades are sorted).
+    n_k = int(np.searchsorted(traded, price.size - trades))
+    if n_k:
+        rel_dev = (p_t[:n_k] - m_t[:n_k]) / m_t[:n_k]
+        if impact_log.any():  # all zero when alpha = 0
+            k = traded[:n_k]
+            rel_dev = rel_dev - (impact_log[k + trades] - impact_log[k])
+        realized_spread = float(np.mean(2.0 * d_t[:n_k] * rel_dev))
     else:
         realized_spread = np.nan
 
     if bid is None or ask is None:
         quoted_spread = float(spread)
     elif traded.size:
-        quoted = (ask[traded] - bid[traded]) / efficient[traded]
+        quoted = (per_trade(ask) - per_trade(bid)) / m_t
         quoted_spread = float(np.mean(quoted))
     else:
         quoted_spread = np.nan
