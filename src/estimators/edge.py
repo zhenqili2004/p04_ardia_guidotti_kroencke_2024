@@ -1,9 +1,9 @@
 """
 EDGE: Efficient Discrete Generalized Estimator of bid-ask spreads.
 
-Numeric logic is bit-identical to upstream; only the input parameter type
-annotations were corrected from `np.array` (which is a function, not a type,
-and triggers Pyright errors) to `numpy.typing.ArrayLike`.
+Numeric results are bit-identical to upstream. The input parameters are
+annotated with `_Vec` (`Any`, see below) instead of upstream's `np.array`,
+which is a function, not a type, and triggers Pyright errors.
 
 The moment conditions themselves are computed in `edge_moments.py` (moved
 there unchanged), so that EDGE is computed in one place and the extension's

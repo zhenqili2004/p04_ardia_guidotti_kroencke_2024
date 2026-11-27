@@ -17,9 +17,11 @@ the paper's Table 1):
 
 Under the paper's Assumptions 1-3 (fundamental returns serially
 uncorrelated and uncorrelated with bid-ask bounces; bounces serially
-uncorrelated with mean zero), each of x1, x2 and the four DGEs has
-expectation S^2 = (S_o^2 + S_c^2) / 2, the mean squared effective spread of
-the open and close trades (eqs. 19-20). The coefficients pi_o = -8 / po and
+uncorrelated with mean zero), x1 and x2 each have expectation
+S^2 = (S_o^2 + S_c^2) / 2, the mean squared effective spread of the open and
+close trades (eqs. 19-20). Of the four DGEs, OHL and OHLC estimate the open
+spread S_o^2, and CHL and CHLO the close spread S_c^2 (Table 1); the two
+coincide when the open and close trades pay the same spread. The coefficients pi_o = -8 / po and
 pi_c = -8 / pc account for discretely observed prices: they correct for the
 open (previous close) trade being itself the high or low trade of its bar
 (Appendix A.2). Returns are de-meaned with the indicator tau_t (eqs. 7, 9),
@@ -54,7 +56,11 @@ class EdgeMoments:
     entry 0 is always NaN; entries are also NaN where an input is missing.
     When EDGE is undefined (fewer than 3 bars, fewer than 2 bars with
     tau_t = 1, or `po` or `pc` equal to zero), every array is all-NaN and
-    `s2`, `w1`, `w2` are NaN.
+    `s2`, `w1`, `w2` are NaN. When the variances of x1 and x2 do not add up
+    to a positive number, including when they are NaN (for example when
+    every open is missing), EDGE uses equal weights, as upstream does:
+    `w1 = w2 = 0.5` and `s2 = (mean(x1) + mean(x2)) / 2`, which is NaN if
+    either mean is.
 
     Attributes
     ----------
@@ -62,7 +68,8 @@ class EdgeMoments:
         The two moment conditions, x1 = (OHL + CHL) / 2 and
         x2 = (OHLC + CHLO) / 2, in squared log-spread units.
     ohl, chl, ohlc, chlo : np.ndarray
-        The four DGE building blocks (paper's Table 1); each estimates S^2.
+        The four DGE building blocks (paper's Table 1). OHL and OHLC
+        estimate the open spread S_o^2, CHL and CHLO the close spread S_c^2.
     po, pc, pt : float
         Probabilities estimated from the data:
         po = P[o_t != h_t, tau_t = 1] + P[o_t != l_t, tau_t = 1],
