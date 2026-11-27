@@ -91,7 +91,9 @@ autocorrelation from OHLC prices alone. Earlier work on autocorrelated order flo
    with persistence passed from trade to trade or decaying with time) and variable trading frequency. The main
    results vary the number of trades per bar; thinning by minutes without trades is reported separately.
 2. Bias, RMSE and fraction of non-positive estimates of EDGE, its four DGE building blocks, AR, CS and Roll
-   as `rho` and trading frequency vary.
+   as `rho` and trading frequency vary. Estimates follow the paper's conventions (its Table 2): CS includes
+   the overnight adjustment, and a negative squared-spread estimate is reset to zero only at the final
+   estimate (Eq. 26), not window by window; the fraction of non-positive estimates is counted before that reset.
 3. An OHLC-only estimator of order-flow autocorrelation, `rho_hat = 1 - mean(x2) / mean(x1)`, where x1 and x2 are
    EDGE's two moment conditions, with a delta-method Newey-West standard error, and a rho-robust spread
    estimate `sqrt(mean(x1))`. Exposed as tested, documented functions:
