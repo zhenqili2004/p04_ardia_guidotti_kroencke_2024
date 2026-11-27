@@ -31,6 +31,8 @@ at the previous close. EDGE weights the two means to minimise variance:
 
 The arithmetic is the upstream `bidask` code moved here unchanged (same
 operations in the same order), so `edge()` stays bit-identical to `bidask`.
+bidask (https://github.com/eguidotti/bidask) is (c) 2024 Emanuele Guidotti
+under the MIT License; see LICENSE-bidask.txt in this folder.
 """
 
 import warnings

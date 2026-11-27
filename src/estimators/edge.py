@@ -9,6 +9,9 @@ The moment conditions themselves are computed in `edge_moments.py` (moved
 there unchanged), so that EDGE is computed in one place and the extension's
 diagnostics can reuse the per-bar moments. `edge()` only takes the signed
 root of the squared spread that `edge_moments()` returns.
+
+Adapted from bidask (https://github.com/eguidotti/bidask), (c) 2024
+Emanuele Guidotti, MIT License; see LICENSE-bidask.txt in this folder.
 """
 
 from typing import Any
