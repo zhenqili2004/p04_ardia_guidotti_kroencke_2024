@@ -72,8 +72,8 @@ output to a printed table — you are comparing it to the thing itself.
 *Agreed with Prof. Bejarano by email on 2026-11-20.*
 
 **Question.** EDGE is derived, and evaluated in the paper's Monte Carlo, only under the paper's
-Assumptions 1-3 (a random-walk fundamental price, and bid-ask bounces that are serially uncorrelated,
-mean zero, and uncorrelated with fundamental returns). We ask how EDGE behaves when those
+Assumptions 1-3 (fundamental returns that are not serially correlated, and bid-ask bounces that are
+serially uncorrelated, mean zero, and uncorrelated with fundamental returns). We ask how EDGE behaves when those
 assumptions fail, and we show that EDGE's two moment conditions identify order-flow (trade-sign)
 autocorrelation from OHLC prices alone. Earlier work on autocorrelated order flow
 (Choi, Salandro & Shastri, 1988) needs trade-level data to estimate it.
@@ -98,7 +98,7 @@ autocorrelation from OHLC prices alone. Earlier work on autocorrelated order flo
    counted before that reset.
 3. An OHLC-only estimator of order-flow autocorrelation, `rho_hat = 1 - mean(x2) / mean(x1)`, where x1 and x2 are
    EDGE's two moment conditions, with a delta-method Newey-West standard error, and a rho-robust spread
-   estimate `sqrt(mean(x1))`. Exposed as tested, documented functions:
+   estimate `sqrt(max(mean(x1), 0))`. Exposed as tested, documented functions:
    `edge_moments`, `rho_hat`, `spread_x1`, `edge_diagnostics`.
 4. A reliability map showing where EDGE and `rho_hat` can be trusted: trades per bar, sample size,
    and spread relative to volatility.
@@ -119,7 +119,7 @@ autocorrelation from OHLC prices alone. Earlier work on autocorrelated order flo
   no ticks, no price impact): |median bias of rho_hat| <= 0.05, and 95% interval coverage between 90% and 98%.
 - Priority 2 predictions: (1 - alpha) * S^2 under price impact; S / sqrt(2) when the open is an auction.
 - Spread estimates are compared with two truths: the effective spread of all trades, and that of the open
-  and close trades, (S_o^2 + S_c^2) / 2, which is what EDGE targets.
+  and close trades, sqrt((S_o^2 + S_c^2) / 2), whose square is what EDGE targets.
 - Failure regions (thin trading, auctions, ticks, rho and impact together) are reported as results.
 
 *Note on tolerances.* We explored a prototype before writing these thresholds. They were fixed after that
