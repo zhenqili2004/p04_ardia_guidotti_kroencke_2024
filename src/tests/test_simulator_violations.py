@@ -311,12 +311,14 @@ def test_boundary_correlation_with_minutes_without_trades(persistence):
     #   E[gap] = (2 - p) / p = 9 slots, under either persistence.
     # Their sign correlation is rho = 0.5 under "trade" persistence, and
     #   E[rho ** gap] = p^2 rho / (1 - rho (1 - p))^2 = 0.0556 under "time".
-    # Measured over 10 seeds: SD of the gap mean 0.09, of rho_b_expected
-    # (time) 0.002, of rho_b_realized 0.008 (time) / 0.018 (trade).
-    # Tolerances: 0.5, 0.01, 0.05 / 0.09.
+    # 15,000 bars. SD of the gap mean: sqrt(2 (1 - p) / p^2 / n) = 0.05; of
+    # rho_b_realized: sqrt((1 - rho_b^2) / n) = 0.008 (time) / 0.007
+    # (trade); measured over 40 other seeds: 0.048, 0.009 / 0.006, and
+    # 0.0008 for rho_b_expected (time). Tolerances 0.5, 0.05 / 0.09 and 0.01
+    # are at least 5.6 SD.
     p, rho = 0.2, 0.5
     _, truth = simulate_ohlc_violations(
-        n=4000,
+        n=15000,
         trades=50,
         prob=p,
         rho=rho,
@@ -343,11 +345,12 @@ def test_realized_spread_under_surprise_impact(rho, alpha, prob, persistence):
     # u_k = D_k - rho D_prev (consecutive trades have correlation rho in all
     # three cases). E[D_k u_k] = 1 - rho^2 and E[D_k u_j] = 0 for later
     # trades j, so E[realized] = S (1 - alpha (1 - rho^2)) at any horizon;
-    # the effective spread is S exactly. Measured SD of realized / S over 10
-    # seeds: 0.003, 0.005 and 0.005; tolerance 0.025.
+    # the effective spread is S exactly. 25,000 bars; measured SD of
+    # realized / S over 40 other seeds: 0.0028, 0.0033 and 0.0029, so the
+    # tolerance 0.025 is at least 7 SD.
     spread = 0.01
     _, truth = simulate_ohlc_violations(
-        n=10000,
+        n=25000,
         trades=10,
         prob=prob,
         spread=spread,

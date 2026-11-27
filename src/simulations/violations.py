@@ -98,8 +98,10 @@ Measured on the simulated path, not plugged in from formulas:
                        mean squared effective spread of the bars' open
                        (close) trades. This is what EDGE targets (Eqs. 19-20).
                        It equals `effective_spread` when every trade pays the
-                       same spread; with an opening auction S_o = 0, so it is
-                       effective_spread / sqrt(2).
+                       same spread. With an opening auction S_o = 0, so it is
+                       spread / sqrt(2) (`effective_spread` itself is then
+                       spread * sqrt(1 - 1 / trades per bar), because the
+                       auction prints pay no spread).
     realized_spread    mean over trades of
                        2 * D * ((P - M) / M - (I_{k+h} - I_k)),
                        where I is the cumulative impact in log price and the
@@ -107,8 +109,10 @@ Measured on the simulated path, not plugged in from formulas:
                        trade-driven part of the future price move is used:
                        the exogenous returns are independent of D and would
                        add noise but no bias. Trades without a full horizon
-                       left are dropped. Equals effective_spread when
-                       alpha = 0.
+                       left are dropped. With alpha = 0 it is the plain mean
+                       of the per-trade effective spreads, so it equals
+                       effective_spread (a root mean square) only when every
+                       trade pays the same spread (no tick, no auction).
     quoted_spread      mean over trades of (ask - bid) / M; equal to `spread`
                        without a tick grid.
     trades_per_bar     mean number of trades per bar (trades x prob in
