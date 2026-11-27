@@ -1,10 +1,9 @@
 name: tests
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+# Run on every push to any branch and on every pull request, as the course
+# rubric requires ("runs the tests on every push and pull request") and as
+# the cookiecutter_chartbook template's own workflow does.
+on: [push, pull_request]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
