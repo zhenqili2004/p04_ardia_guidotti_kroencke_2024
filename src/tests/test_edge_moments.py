@@ -8,7 +8,9 @@ not computed by them:
 
 1. The `bidask` package (oracle): the signed root of `s2` matches
    `bidask.edge(sign=True)` within 1e-10, including on missing data and on
-   inputs where EDGE is undefined.
+   inputs where EDGE is undefined. Every intermediate quantity (pt, po, pc,
+   the means and variances of x1 and x2, s2) matches the values the author
+   publishes for the two reference files.
 2. A four-bar example worked out by hand with exact fractions, which pins
    down x1, x2, all four DGE building blocks, and the weights.
 3. The decomposition S_hat^2 = w1 * mean(x1) + w2 * mean(x2) that the
@@ -78,6 +80,60 @@ def test_signed_root_of_s2_matches_bidask(case):
     else:
         # Same tolerance as the existing edge() vs bidask oracle tests.
         assert ours == pytest.approx(theirs, abs=1e-10), case
+
+
+# --- 1b. The author's published intermediate values ------------------------
+# bidask's pseudocode/README.md (https://github.com/eguidotti/bidask) lists
+# every intermediate quantity of the estimator on the two reference files
+# in _fixtures/, "to check and debug the intermediate steps". Matching them
+# checks each step of edge_moments(), not only the final estimate.
+AUTHOR_INTERMEDIATES = {
+    "fixture": {
+        "pt": 0.9820982098209821,
+        "po": 1.227922792279228,
+        "pc": 1.2052205220522052,
+        "e1": 0.00010702425689560482,
+        "e2": 0.000101595812797079,
+        "v1": 2.074215642985551e-06,
+        "v2": 1.3461279919743572e-06,
+        "s2": 0.00010373225911177194,
+    },
+    "fixture_missing_values": {
+        "pt": 0.9822078447230085,
+        "po": 1.2272254421162134,
+        "pc": 1.205827632480371,
+        "e1": 0.00010337780767834583,
+        "e2": 0.00010219271972776808,
+        "v1": 2.0045420261850617e-06,
+        "v2": 1.373839551967266e-06,
+        "s2": 0.00010267464299824543,
+    },
+}
+
+
+@pytest.mark.parametrize("case", AUTHOR_INTERMEDIATES)
+def test_intermediates_match_author_published_values(case):
+    data = ORACLE_CASES[case]
+    m = edge_moments(data.Open, data.High, data.Low, data.Close)
+    e1, e2 = np.nanmean(m.x1), np.nanmean(m.x2)
+    got = {
+        "pt": m.pt,
+        "po": m.po,
+        "pc": m.pc,
+        "e1": e1,
+        "e2": e2,
+        "v1": np.nanmean(m.x1**2) - e1**2,
+        "v2": np.nanmean(m.x2**2) - e2**2,
+        "s2": m.s2,
+    }
+    expected = AUTHOR_INTERMEDIATES[case]
+    for name, value in expected.items():
+        # The author prints 16 significant digits; 1e-10 relative leaves room
+        # for summation order and still catches any real difference.
+        assert got[name] == pytest.approx(value, rel=1e-10), f"{case}: {name}"
+    # The weights follow from the variances (paper's Eq. 25).
+    v1, v2 = expected["v1"], expected["v2"]
+    assert m.w2 == pytest.approx(v1 / (v1 + v2), rel=1e-10), f"{case}: w2"
 
 
 # ===========================================================================
